@@ -7,6 +7,7 @@ Embedded systems class project for monitoring charging-device temperature, ident
 - `firmware_node/` — Sensor Node firmware and its ESP-NOW message handling.
 - `firmware_gateway/` — Gateway firmware, safety-state logic, notifications, and cloud connection.
 - `simulator/` — Computer-based sensor and Gateway simulator.
+- `dashboard/` — NETPIE dashboard plan, field mapping, and exported artifacts.
 - `docs/` — Architecture, data contract, wiring notes, and test records.
 - `software_checklist.md` — Work breakdown and implementation checklist.
 
@@ -24,3 +25,5 @@ This repository currently contains the project structure and planning documents.
 ## Secrets
 
 Do not commit Wi-Fi passwords, cloud credentials, webhook URLs, or real local config files. Use the ignored local config files described in each component. Example templates may be committed only when they contain placeholders.
+
+
