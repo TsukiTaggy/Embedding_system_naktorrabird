@@ -1,5 +1,15 @@
 # Simulator
 
-Place computer-based simulator code here. The simulator should use the same telemetry contract as the firmware and support repeatable scenarios such as normal readings, gradual/rapid temperature rise, over-temperature, sensor fault, and network loss.
+The computer-based simulator should model the planned two-board system while using the same fields described in `../docs/data-contract.md`.
 
-Start with local output and a dry-run mode. Add cloud publishing or external notifications only after the local data flow is working. Never commit credentials; use ignored local configuration or environment variables.
+## Planned scenarios
+
+- Normal temperature/current readings.
+- Gradual and rapid battery temperature rise.
+- Over-temperature state.
+- MQ-135 raw reading changes and KY-026 flame event.
+- Missing/stale Sensor Node message.
+- Invalid sensor value and Gateway network loss.
+- KY-004 stop/reset event and reported servo cut-off state (simulated only).
+
+Begin with local output and dry-run behavior. Keep cloud publishing and external notifications optional. Never commit credentials. Sensor values and thresholds in simulations are for software behavior demonstrations, not validated safety limits.

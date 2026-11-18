@@ -1,37 +1,18 @@
 # NETPIE Dashboard
 
-This folder holds dashboard planning and exported/configuration artifacts for the charging safety monitor.
+This folder contains dashboard planning and safe-to-commit setup/export artifacts for the charging safety monitor. NETPIE is the planned platform; verify the team's account and currently supported dashboard/data-ingestion workflow before implementation.
 
-## Planned dashboard view
+## Planned displays
 
-- System state: `NORMAL`, `WARNING`, `HAZARD`, `SENSOR_ERROR`, or `OFFLINE` (confirm final state names).
-- Battery-surface temperature (`temp_bat_c`) with units and history.
-- Temperature trend (`temp_rate_c_per_s`), if implemented.
-- Ambient temperature and humidity, if those sensors are used.
-- Current, gas, and flame readings only when the corresponding sensor is in scope and its value is interpreted correctly.
-- Last update time, connection status, and power-cut state.
+- System state and last update / connectivity freshness.
+- DS18B20 battery-surface temperature (`temp_bat_c`) and history.
+- MQ-135 raw reading (`gas_raw`), clearly labeled as raw until calibrated.
+- KY-026 flame level/event (`flame_detected`, optionally `flame_event`).
+- ACS712 charging current (`current_a`) after calibration.
+- DHT11 ambient temperature (`temp_ambient_c`) and humidity (`humidity_pct`).
+- Gateway cut-off state (`power_cut`).
+- Optional temperature trend (`temp_rate_c_per_s`) if implemented.
 
-## Setup notes
+Use `../docs/data-contract.md` as the source of field definitions. Show invalid or stale readings distinctly from zero. Remote stop/reset controls are not planned until a safe command path and reset behavior are defined and tested.
 
-1. Confirm the team's NETPIE account, project/device model, and the currently supported dashboard/data-ingestion workflow.
-2. Use the shared contract in `../docs/data-contract.md` as the starting point for field mapping.
-3. Connect simulator telemetry first, then validate with ESP32 data.
-4. Keep credentials, access tokens, and webhook URLs in local configuration or the service's secret store. Never commit them here.
-5. Add dashboard screenshots, export files, or setup notes to this directory when available. Check provider terms and export format before committing generated files.
-
-## Widget mapping draft
-
-| Display | Contract field | Display notes |
-| --- | --- | --- |
-| System state | `state` | Prominent text/status indicator |
-| Battery temperature | `temp_bat_c` | °C; show missing/stale data distinctly |
-| Temperature trend | `temp_rate_c_per_s` | °C/s; include only if trend calculation is implemented |
-| Ambient temperature | `temp_ambient_c` | °C; optional |
-| Humidity | `humidity_pct` | %RH; optional |
-| Charging current | `current_a` | A; only after sensor calibration/interpretation |
-| Gas reading | `gas_raw` | Raw value unless calibrated |
-| Flame | `flame_detected` | Boolean/status |
-| Cut-off status | `power_cut` | Show the Gateway's reported state |
-| Freshness/connectivity | `timestamp_ms` plus device connection | Define stale-data timeout in the implementation |
-
-Remote cut/reset controls are not included in this scaffold. Add them only after a safe command path and local confirmation behavior have been designed and tested.
+Never commit access tokens, credentials, or webhook URLs.

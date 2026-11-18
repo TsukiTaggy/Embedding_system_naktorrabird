@@ -4,13 +4,13 @@
 
 Build the software for an embedded charging safety monitor. The system should monitor battery temperature and other available sensor signals, identify unsafe conditions, alert the user, and support a controlled power cut. The first development target is a computer simulator and dashboard; the firmware will run on ESP32 hardware later.
 
-> Treat sensor assignments and cloud platform details below as planning assumptions from the project notes. Confirm the final hardware, thresholds, data protocol, and currently supported cloud features with the team before relying on them.
+> Confirmed hardware plan: two ESP32 DevKit V1 30-pin boards. The Sensor Node uses DS18B20/KY-001, MQ-135, and interrupt-driven KY-026; the Gateway uses ACS712 5 A, DHT11, MG90S servo, and KY-004. ESP-NOW and NETPIE are planned. Pin mappings, thresholds, calibration, protocol details, and button stop/reset behavior still need agreement.
 
 ## 1. Define the software requirements
 
 - [ ] Write a short system description and the exact problem the software solves.
-- [ ] Decide which ESP32 boards are active roles: Sensor Node, Gateway, and whether any third board has a defined purpose.
-- [ ] Confirm which sensors are read by each board (proposed: DS18B20 battery-surface temperature at the Node; DHT11 ambient temperature/humidity and other sensors at the Gateway).
+- [x] Select the two main board roles: ESP32 DevKit V1 30-pin Sensor Node and ESP32 DevKit V1 30-pin Gateway.
+- [x] Assign sensors: Node reads DS18B20/KY-001, MQ-135, and interrupt-driven KY-026; Gateway reads ACS712 5 A and DHT11, and controls MG90S servo and KY-004.
 - [ ] Confirm the required sensor set and which readings are optional or only for demonstration (for example, gas, flame, and charging current).
 - [ ] Agree on operating modes and user-visible states, such as `STARTING`, `NORMAL`, `WARNING`, `HAZARD`, `SENSOR_ERROR`, and `OFFLINE`.
 - [ ] Agree on what the system does for each state, including whether a hazard automatically triggers power cut.
@@ -20,13 +20,14 @@ Build the software for an embedded charging safety monitor. The system should mo
 
 ## 2. Set up the software repository
 
-- [ ] Create and document a clean project layout:
-  - [ ] `firmware_node/` — sensor reading and Node-to-Gateway transport
-  - [ ] `firmware_gateway/` — sensor aggregation, decision logic, alerts, and cloud connection
-  - [ ] `simulator/` — computer-based simulated sensor data and scenarios
-  - [ ] `docs/` — architecture, data format, wiring references, setup, and test notes
-- [ ] Add a `README.md` with project purpose, setup steps, run instructions, and current status.
-- [ ] Add `.gitignore` entries for local secrets, generated files, build outputs, and editor files.
+- [x] Create and document a clean project layout:
+  - [x] `firmware_node/` — sensor reading and ESP-NOW transport
+  - [x] `firmware_gateway/` — sensor aggregation, decision logic, actuator, alerts, and cloud connection
+  - [x] `simulator/` — computer-based simulated sensor data and scenarios
+  - [x] `dashboard/` — NETPIE dashboard planning and field mapping
+  - [x] `docs/` — architecture, data contract, wiring references, setup, and test notes
+- [x] Add root and component README files with project purpose, responsibilities, and current decisions.
+- [x] Add `.gitignore` entries for local secrets and common generated/build files.
 - [ ] Add a tracked `config.example.h` or equivalent template with placeholder values only.
 - [ ] Keep real cloud credentials and webhook URLs out of source control; use local config or environment variables.
 - [ ] Choose and record the firmware toolchain (Arduino IDE or PlatformIO) and the simulator Python version.
@@ -139,3 +140,5 @@ Build the software for an embedded charging safety monitor. The system should mo
 6. ESP32 sensor drivers and Node-to-Gateway link
 7. Cloud integration on hardware
 8. Safe actuator demonstration and final integration
+
+

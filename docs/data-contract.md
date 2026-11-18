@@ -1,32 +1,50 @@
 # Data Contract
 
-The simulator and firmware should use one shared, versioned message contract. The schema below is a planning draft; confirm field names, sensor assignments, units, and transport with the team before implementation.
+The Sensor Node and Gateway should share a versioned ESP-NOW message format. The simulator, Gateway cloud publisher, and NETPIE dashboard should use the same field meanings. This schema is the agreed hardware-oriented draft; confirm sample rates, ranges, and encoding with the team before implementation.
 
-## Draft telemetry fields
+## Sensor Node to Gateway telemetry
 
 | Field | Type | Unit / meaning |
 | --- | --- | --- |
-| `schema_version` | integer | Contract version |
-| `sequence` | integer | Increasing message number |
-| `timestamp_ms` | integer | Uptime timestamp, or use a documented wall-clock format |
-| `temp_bat_c` | number or null | Battery-surface temperature in °C |
-| `temp_ambient_c` | number or null | Ambient temperature in °C |
-| `humidity_pct` | number or null | Relative humidity, percent |
-| `current_a` | number or null | Current in amperes, if measured and calibrated |
-| `gas_raw` | integer or null | Raw gas-sensor reading unless calibration defines another unit |
-| `flame_detected` | boolean or null | Flame sensor state |
-| `temp_rate_c_per_s` | number or null | Temperature trend in °C/s, if implemented |
+| `schema_version` | integer | Message contract version |
+| `sequence` | integer | Increasing Node message number |
+| `uptime_ms` | integer | Node uptime when sampled |
+| `temp_bat_c` | number or null | DS18B20 battery-surface temperature in °C |
+| `gas_raw` | integer or null | MQ-135 raw ADC reading; not a calibrated gas concentration |
+| `flame_detected` | boolean | KY-026 digital state; document active-high/active-low polarity after wiring |
+| `flame_event` | boolean | Whether the interrupt captured a new flame transition/event since the prior report |
+| `sensor_status` | object | Per-sensor validity/error flags |
+
+## Gateway aggregate telemetry
+
+| Field | Type | Unit / meaning |
+| --- | --- | --- |
+| `schema_version` | integer | Message contract version |
+| `timestamp_ms` | integer | Gateway uptime, or use a separately documented wall-clock format |
+| `node_sequence` | integer or null | Most recently accepted Node sequence |
+| `node_age_ms` | integer or null | Age of last accepted Node message |
+| `temp_bat_c` | number or null | Forwarded DS18B20 reading in °C |
+| `gas_raw` | integer or null | Forwarded MQ-135 raw reading |
+| `flame_detected` | boolean or null | Forwarded KY-026 level |
+| `temp_ambient_c` | number or null | DHT11 ambient temperature in °C |
+| `humidity_pct` | number or null | DHT11 relative humidity in percent |
+| `current_a` | number or null | ACS712 current in amperes after calibration |
+| `temp_rate_c_per_s` | number or null | Optional battery-temperature trend in °C/s |
 | `state` | string | Agreed system state |
-| `power_cut` | boolean | Whether the local cut-off output is active |
-| `validity` | object | Per-sensor validity or error information |
+| `power_cut` | boolean | Gateway-reported cut-off state |
+| `button_event` | string or null | KY-004 event, using agreed values such as `STOP` or `RESET` |
+| `validity` | object | Sensor and message validity/error information |
 
 ## Contract rules to settle
 
-- [ ] Choose exact required and optional fields.
+- [ ] Define exact field encoding for ESP-NOW and cloud publication.
+- [ ] Define Node and Gateway sample/publish rates and stale-message timeout.
+- [ ] Confirm KY-026 active polarity and interrupt event/latching behavior.
 - [ ] Define missing, stale, invalid, and out-of-range reading behavior.
-- [ ] Define message frequency and stale-message timeout.
+- [ ] Define ACS712 zero offset, calibration, current direction, and safe ADC scaling.
 - [ ] Define state names and allowed transitions.
-- [ ] Define transport framing and maximum message size.
-- [ ] Keep sensor values distinguishable from zero when unavailable (use `null` plus validity information, or an agreed equivalent).
+- [ ] Treat `gas_raw` as raw until the sensor is warmed up and a calibration/interpretation method is selected.
+- [ ] Ensure unavailable readings are distinguishable from zero.
+- [ ] Define KY-004 stop/reset event semantics and ensure reset cannot silently re-enable charging.
 
-Do not use uncalibrated gas/current values as precise physical measurements. Document calibration and units before displaying engineering values.
+Do not use uncalibrated gas/current readings as precise physical measurements.

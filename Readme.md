@@ -13,7 +13,7 @@ Embedded systems class project for monitoring charging-device temperature, ident
 
 ## Current development status
 
-This repository currently contains the project structure and planning documents. Hardware roles, sensor assignments, thresholds, message fields, cloud provider, and pin mappings are still to be confirmed by the team. Keep safety thresholds configurable and do not treat example values as validated battery-protection limits.
+The team has selected two ESP32 DevKit V1 30-pin boards: a Sensor Node with DS18B20/KY-001, MQ-135, and interrupt-driven KY-026; and a Gateway with ACS712 5 A, DHT11, MG90S servo, and KY-004 button. The proposed link is ESP-NOW, and NETPIE is the planned dashboard platform. Pin mappings, thresholds, message timing, sensor calibration, and stop/reset behavior still need to be confirmed. Keep thresholds configurable and do not treat example values as validated battery-protection limits.
 
 ## Getting started
 
@@ -25,5 +25,6 @@ This repository currently contains the project structure and planning documents.
 ## Secrets
 
 Do not commit Wi-Fi passwords, cloud credentials, webhook URLs, or real local config files. Use the ignored local config files described in each component. Example templates may be committed only when they contain placeholders.
+
 
 
