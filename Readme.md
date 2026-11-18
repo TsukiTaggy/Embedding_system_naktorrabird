@@ -1,1 +1,26 @@
-#Project for Embedded System Class
+# Charging Safety Alarm
+
+Embedded systems class project for monitoring charging-device temperature, identifying unsafe conditions, and notifying the user. The software is being prepared for ESP32 hardware, with a computer simulator for development before the boards are available.
+
+## Repository layout
+
+- `firmware_node/` — Sensor Node firmware and its ESP-NOW message handling.
+- `firmware_gateway/` — Gateway firmware, safety-state logic, notifications, and cloud connection.
+- `simulator/` — Computer-based sensor and Gateway simulator.
+- `docs/` — Architecture, data contract, wiring notes, and test records.
+- `software_checklist.md` — Work breakdown and implementation checklist.
+
+## Current development status
+
+This repository currently contains the project structure and planning documents. Hardware roles, sensor assignments, thresholds, message fields, cloud provider, and pin mappings are still to be confirmed by the team. Keep safety thresholds configurable and do not treat example values as validated battery-protection limits.
+
+## Getting started
+
+1. Read `docs/architecture.md` and `docs/data-contract.md`.
+2. Confirm the project decisions listed in those documents with the team.
+3. Build the simulator and local decision logic before connecting cloud services.
+4. Add ESP32-specific code after confirming the actual board and wiring.
+
+## Secrets
+
+Do not commit Wi-Fi passwords, cloud credentials, webhook URLs, or real local config files. Use the ignored local config files described in each component. Example templates may be committed only when they contain placeholders.

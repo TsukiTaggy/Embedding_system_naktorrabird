@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+config.h
+config.local.h
+secrets.*
+
+# ESP32 / PlatformIO / Arduino build artifacts
+.pio/
+build/
+.DS_Store
+Thumbs.db
