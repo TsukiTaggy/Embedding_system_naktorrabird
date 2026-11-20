@@ -1,0 +1,12 @@
+{
+  "warn_temp_c": 45.0,
+  "hazard_temp_c": 55.0,
+  "warn_rate_c_per_s": 0.2,
+  "hazard_rate_c_per_s": 1.0,
+  "warn_gas_raw": 1500,
+  "hazard_gas_raw": 2500,
+  "rate_window_s": 10.0,
+  "rate_min_samples": 5,
+  "warning_clear_samples": 5,
+  "node_stale_ms": 5000
+}
