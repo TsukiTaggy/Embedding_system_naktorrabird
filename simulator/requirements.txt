@@ -1,0 +1,2 @@
+# Only needed for --publish (NETPIE). Local dry runs and tests use the standard library only.
+paho-mqtt>=1.6,<3
