@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "timestamp_ms": 412000,
+  "node_sequence": 815,
+  "node_age_ms": 510,
+  "temp_bat_c": 41.5,
+  "gas_raw": 1350,
+  "flame_detected": false,
+  "temp_ambient_c": 28.4,
+  "humidity_pct": 63.0,
+  "current_a": 1.95,
+  "temp_rate_c_per_s": 0.35,
+  "state": "WARNING",
+  "power_cut": false,
+  "button_event": null,
+  "validity": {
+    "node_link": true,
+    "temp_bat": true,
+    "gas": true,
+    "flame": true,
+    "ambient": true,
+    "current": true
+  }
+}
