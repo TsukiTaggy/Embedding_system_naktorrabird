@@ -75,47 +75,74 @@ def chart(title, fields, minutes, y_title, axes=1, step=False):
         "totalyaxis": axes, "height_block": 3}}
 
 
-def pane(title, col_width, widgets, row, col):
-    """row/col are freeboard grid positions for a 4-column screen; narrower screens stack panes."""
+FULL = 16      # wider than any screen: freeboard clamps a pane to the visible column count
+HALF = 2       # metric panes; freeboard columns are about 220-240 px wide
+MAX_COLS = 16  # freeboard picks the column count from the window width at load time
+
+
+def pane(title, col_width, widgets):
     for w in widgets:
         w["id"] = wid()
         w["settings"]["id"] = w["id"]
-    rows = {"1": row, "2": row, "3": row, "4": row}
-    cols = {"1": 1, "2": 1 if col == 1 else 2, "3": min(col, 3), "4": col}
-    return {"title": title, "width": 1, "col_width": col_width, "row": rows, "col": cols, "widgets": widgets}
+    return {"title": title, "width": 1, "col_width": col_width, "widgets": widgets}
 
 
-PANES = [
-    pane("1. System status", 4, row=1, col=1, widgets=[
-        html("state_banner.html", 2),
-        indicator("Charging power", f'{shadow("power_cut")} === true', "#C62828", "#2E7D32",
-                  "POWER CUT", "CHARGING ALLOWED"),
-        indicator("Gateway link (NETPIE)", f'{STATUS} == 1', "#2E7D32", "#616161",
-                  "Gateway online", "Gateway OFFLINE"),
+def place(panes):
+    """Give every pane a row/col for each possible column count (1..MAX_COLS).
+
+    Freeboard columns have a fixed width computed from the window width, so a
+    pane cannot stretch. Full-width panes use FULL (clamped to the screen); the
+    metric panes are HALF wide and packed as many per row as fit, which fills
+    the width on even column counts and leaves at most one column on odd ones.
+    Rows only give the order: gridster pushes overlapping panes down, so small
+    row numbers pack the dashboard without gaps.
+    """
+    for p in panes:
+        p["row"], p["col"] = {}, {}
+    for cols in range(1, MAX_COLS + 1):
+        row, slot = 1, 0
+        per_row = max(1, cols // HALF)
+        for p in panes:
+            if p["col_width"] >= FULL:
+                if slot:
+                    row, slot = row + 1, 0
+                p["row"][str(cols)], p["col"][str(cols)] = row, 1
+                row += 1
+            else:
+                p["row"][str(cols)], p["col"][str(cols)] = row, 1 + slot * HALF if cols >= HALF else 1
+                slot += 1
+                if slot >= per_row:
+                    row, slot = row + 1, 0
+    return panes
+
+
+PANES = place([
+    pane("1. System status", FULL, [
+        html("state_banner.html", 3),
     ]),
-    pane("2. Battery", 2, row=9, col=1, widgets=[
+    pane("2. Battery", HALF, [
         text("Battery surface temp (DS18B20)", fmt("temp_bat_c", 1), "°C", size="big"),
         gauge("Battery surface temp", "temp_bat_c", "°C", 0, 100),
         text("Temp rise rate dT/dt", fmt("temp_rate_c_per_s", 2), "°C/s"),
         chart("Battery temp & dT/dt (last 10 min)", ["temp_bat_c", "temp_rate_c_per_s"], 10, "°C | °C/s", axes=2),
     ]),
-    pane("3. Fire / gas", 2, row=9, col=3, widgets=[
+    pane("3. Fire / gas", HALF, [
         indicator("Flame (KY-026)", f'{shadow("flame_detected")} === true', "#C62828", "#9E9E9E",
                   "FLAME DETECTED", "No flame", blinking=f'{shadow("flame_detected")} === true'),
         text("Gas MQ-135 (raw ADC, uncalibrated - not ppm)", fmt("gas_raw", 0), "raw"),
         chart("Gas raw (last 10 min)", ["gas_raw"], 10, "raw ADC"),
     ]),
-    pane("4. Charging", 2, row=31, col=1, widgets=[
+    pane("4. Charging", HALF, [
         text("Charging current (ACS712)", fmt("current_a", 2), "A", size="big"),
         gauge("Charging current", "current_a", "A", 0, 5, decimals=2),
         chart("Charging current (last 10 min)", ["current_a"], 10, "A"),
     ]),
-    pane("5. Ambient (DHT11)", 2, row=31, col=3, widgets=[
+    pane("5. Ambient (DHT11)", HALF, [
         text("Ambient temp", fmt("temp_ambient_c", 1), "°C"),
         text("Humidity", fmt("humidity_pct", 1), "%"),
         chart("Ambient (last 1 h)", ["temp_ambient_c", "humidity_pct"], 60, "°C | %", axes=2),
     ]),
-    pane("6. Diagnostics", 4, row=51, col=1, widgets=[
+    pane("6. Diagnostics", FULL, [
         html("sensor_health.html", 4),
         text("Node data age", fmt("node_age_ms", 1, scale=0.001), "s"),
         text("Node message #", fmt("node_sequence", 0)),
@@ -125,7 +152,7 @@ PANES = [
         text("Contract version", fmt("schema_version", 0)),
         chart("Power cut / flame events (last 10 min)", ["power_cut", "flame_detected"], 10, "1 = on", step=True),
     ]),
-]
+])
 
 
 def main() -> None:

@@ -67,7 +67,7 @@ Create one Datatag per numeric field under **Device → Feed → + Add datatag**
 | Field | Source | Widget(s) | Title / unit | Display range | Notes |
 | --- | --- | --- | --- | --- | --- |
 | `state` | Gateway logic | **HTML** state banner (§5) | System state | n/a | Indicator Light only supports 2 states, so use HTML for multi-state colour |
-| `power_cut` | Gateway | Indicator Light + banner | Charging power | ON = cut, OFF = supplied | ON colour red, ON TEXT `POWER CUT`, OFF TEXT `CHARGING ALLOWED` |
+| `power_cut` | Gateway | Banner chip | Charging power | CUT / supplied / unknown | Shown as a chip inside the state banner |
 | `temp_bat_c` | Node (DS18B20) | Text (Big) + Gauge + Chart | Battery surface temp, °C | 0–100 | 1 decimal |
 | `temp_rate_c_per_s` | Gateway logic | Text + Chart (2nd axis) | Temp rise rate, °C/s | can be negative | 2 decimals; optional field, so hide the panel if not implemented |
 | `gas_raw` | Node (MQ-135) | Text + Chart | **Gas (raw ADC, uncalibrated)** | 0–4095 (verify ADC resolution) | Never label as ppm |
@@ -79,9 +79,9 @@ Create one Datatag per numeric field under **Device → Feed → + Add datatag**
 | `node_sequence` | Gateway | Text (diagnostics) | Node message # | n/a | Should keep increasing; a frozen value means no new Node data |
 | `button_event` | Gateway (KY-004) | Text (diagnostics) | Last button event | n/a | Shows `STOP` / `RESET` / `—` |
 | `validity` | Gateway | HTML (diagnostics table) | Sensor health | n/a | Object shape is still a draft; see §7 |
-| `timestamp_ms` | Gateway | Text (diagnostics) | Gateway uptime | n/a | Show as `hh:mm:ss`; not wall-clock time |
+| `timestamp_ms` | Gateway | Banner chip + Text (diagnostics) | Gateway uptime | n/a | Banner shows `Xm Ys`; not wall-clock time |
 | `schema_version` | Gateway | Text (diagnostics) | Contract version | n/a | Must match the version this mapping was written for (1) |
-| (device) `status` | NETPIE | Banner + Indicator Light | Gateway online | 1 / 0 | Source of the dashboard-only `OFFLINE` display |
+| (device) `status` | NETPIE | Banner (title + chip) | Gateway online | 1 / 0 | Source of the dashboard-only `OFFLINE` display |
 
 **Gauge colour bands.** Leave gauges single-coloured until the team agrees on thresholds. Coloured bands look like safety limits, and the repo does not yet have any validated limits. When thresholds are agreed, take the band edges from the same place the firmware reads them, not from this file.
 
@@ -112,7 +112,7 @@ Apply these rules in this priority order:
 
 | Panel | Widgets |
 | --- | --- |
-| 1. System status (full width) | HTML state banner · Indicator `power_cut` · Indicator Gateway online |
+| 1. System status (full width) | HTML state banner only; its chips show Gateway online, charging power, Node data age and uptime (matches the mockup) |
 | 2. Battery | Text `temp_bat_c` (Big) · Gauge `temp_bat_c` · Text `temp_rate_c_per_s` · Chart `temp_bat_c` + `temp_rate_c_per_s` (2 Y axes, last 10 min) |
 | 3. Fire / gas | Indicator `flame_detected` (blinking) · Text `gas_raw` · Chart `gas_raw` (last 10 min) |
 | 4. Charging | Text `current_a` (Big) · Gauge `current_a` · Chart `current_a` (last 10 min) |
@@ -180,6 +180,16 @@ The early draft below is kept for reference; use the files in `widgets/`.
   document.getElementById("sub").textContent = sub;
 </script>
 ```
+
+### Pane widths on NETPIE (freeboard)
+
+- Freeboard computes a fixed column width from the window width when the page loads: about 219 px minimum per column, so roughly 4 columns at 1280 px and 5 at 1440 px. A pane cannot stretch; its width is `col_width` columns, clamped to the visible column count.
+- `build_layout.py` therefore gives the status and diagnostics panes `col_width` 16, which always fills the screen. The four metric panes are 2 columns wide and packed as many per row as fit. That fills the width on even column counts (for example 1280 px) and leaves one empty column on odd counts (for example 1440 px). A stretchy two-up grid like the mockup is not possible in freeboard.
+- Rows only set the order. Gridster pushes overlapping panes down, so small row numbers pack the page without gaps. It may swap Charging and Ambient to fill space.
+
+### Theme pitfall: white text
+
+NETPIE's freeboard theme sets widget text to white while panes are white. Text-widget units and any HTML-widget text without an explicit colour are invisible. The state banner widget injects `.tw-unit { color: #5F6670 }` for the whole dashboard, and the HTML widgets set their own text colours.
 
 ## 6. Remote controls
 

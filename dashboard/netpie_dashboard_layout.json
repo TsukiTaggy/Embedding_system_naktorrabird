@@ -3,81 +3,59 @@
     {
       "title": "1. System status",
       "width": 1,
-      "col_width": 4,
+      "col_width": 16,
+      "widgets": [
+        {
+          "type": "html",
+          "settings": {
+            "html": "<!-- NETPIE HTML widget: system state banner with status chips (Height Blocks: 3).\n     NETPIE replaces each dollar-brace #[...] reference with the current value before the script runs.\n     Do not write that reference syntax in comments: NETPIE evaluates it everywhere in this widget.\n     Device alias must be EV_Gateway. See dashboard/field-mapping.md section 5. -->\n<style>\n  /* NETPIE's freeboard theme draws widget text white, but its panes are white.\n     These rules make Text-widget units readable on every pane of this dashboard. */\n  .tw-unit { color: #5F6670 !important; }\n</style>\n<div id=\"sb-banner\" style=\"border-radius:10px;padding:16px 18px;font-family:Inter,system-ui,sans-serif\">\n  <div id=\"sb-title\" style=\"font:700 26px/1.25 Inter,system-ui,sans-serif\"></div>\n  <div id=\"sb-chips\" style=\"display:flex;flex-wrap:wrap;gap:8px;margin-top:12px\"></div>\n</div>\n<script>\n(function () {\n  var STALE_MS = 5000; // placeholder until the contract defines the Node timeout\n  function raw(v) { v = String(v); return (v === \"\" || v === \"null\" || v === \"undefined\") ? null : v; }\n\n  var online   = raw(\"${#[\"EV_Gateway\"][\"status\"]}\") === \"1\";\n  var state    = raw(\"${#[\"EV_Gateway\"][\"shadow\"][\"state\"]}\");\n  var cutRaw   = raw(\"${#[\"EV_Gateway\"][\"shadow\"][\"power_cut\"]}\");\n  var powerCut = cutRaw === \"true\";\n  var ageRaw   = raw(\"${#[\"EV_Gateway\"][\"shadow\"][\"node_age_ms\"]}\");\n  var ageMs    = ageRaw === null ? null : Number(ageRaw);\n  var upRaw    = raw(\"${#[\"EV_Gateway\"][\"shadow\"][\"timestamp_ms\"]}\");\n  var upS      = upRaw === null ? null : Math.floor(Number(upRaw) / 1000);\n\n  var STATES = {\n    STARTING:     [\"#1565C0\", \"#FFFFFF\", \"Starting up\"],\n    NORMAL:       [\"#1E7B34\", \"#FFFFFF\", \"Normal\"],\n    WARNING:      [\"#F2B01E\", \"#1B1F24\", \"Warning: check the battery\"],\n    HAZARD:       [\"#B3261E\", \"#FFFFFF\", powerCut ? \"HAZARD: charging power cut\" : \"HAZARD: power cut NOT confirmed\"],\n    SENSOR_ERROR: [\"#6A1B9A\", \"#FFFFFF\", \"Sensor error\"]\n  };\n  var s = STATES[state] || [\"#4F565E\", \"#FFFFFF\", state === null ? \"No data yet\" : \"Unknown state: \" + state];\n  var bg = s[0], fg = s[1], title = s[2];\n  if (!online) { bg = \"#4F565E\"; fg = \"#FFFFFF\"; title = \"OFFLINE: Gateway not connected\" + (state ? \" (last known: \" + state + \")\" : \"\"); }\n\n  var chipBg = fg === \"#FFFFFF\" ? \"rgba(255,255,255,0.16)\" : \"rgba(0,0,0,0.08)\";\n  var nodeText;\n  if (ageMs === null || isNaN(ageMs)) nodeText = \"Node data: none\";\n  else if (ageMs > STALE_MS)          nodeText = \"Node data STALE (\" + (ageMs / 1000).toFixed(1) + \" s old)\";\n  else                                nodeText = \"Node data \" + (ageMs / 1000).toFixed(1) + \" s old\";\n  var chips = [\n    [online ? \"#7CE38B\" : \"#C3C8CE\", online ? \"Gateway online\" : \"Gateway OFFLINE\"],\n    [powerCut ? \"#FFFFFF\" : null, \"Charging power: \" + (cutRaw === null ? \"unknown\" : powerCut ? \"CUT\" : \"supplied\")],\n    [null, nodeText],\n    [null, \"Uptime \" + (upS === null ? \"—\" : Math.floor(upS / 60) + \"m \" + (upS % 60) + \"s\")]\n  ];\n\n  var b = document.getElementById(\"sb-banner\");\n  b.style.background = bg;\n  b.style.color = fg;\n  document.getElementById(\"sb-title\").textContent = title;\n  var box = document.getElementById(\"sb-chips\");\n  box.innerHTML = \"\";\n  for (var i = 0; i < chips.length; i++) {\n    var c = document.createElement(\"span\");\n    c.style.cssText = \"display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:8px;font:600 14px Inter,system-ui,sans-serif;background:\" + chipBg + \";color:\" + fg;\n    if (chips[i][0]) {\n      var dot = document.createElement(\"span\");\n      dot.style.cssText = \"width:10px;height:10px;border-radius:50%;background:\" + chips[i][0];\n      c.appendChild(dot);\n    }\n    c.appendChild(document.createTextNode(chips[i][1]));\n    box.appendChild(c);\n  }\n})();\n</script>\n",
+            "height": 3,
+            "id": "w001"
+          },
+          "id": "w001"
+        }
+      ],
       "row": {
         "1": 1,
         "2": 1,
         "3": 1,
-        "4": 1
+        "4": 1,
+        "5": 1,
+        "6": 1,
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        "10": 1,
+        "11": 1,
+        "12": 1,
+        "13": 1,
+        "14": 1,
+        "15": 1,
+        "16": 1
       },
       "col": {
         "1": 1,
         "2": 1,
         "3": 1,
-        "4": 1
-      },
-      "widgets": [
-        {
-          "type": "html",
-          "settings": {
-            "html": "<!-- NETPIE HTML widget: system state banner. Paste into an HTML widget (Height Blocks: 2).\n     NETPIE replaces each dollar-brace #[...] reference with the current value before the script runs.\n     Do not write that reference syntax in comments: NETPIE evaluates it everywhere in this widget.\n     Device alias must be EV_Gateway. See dashboard/field-mapping.md section 5. -->\n<div id=\"sb-banner\" style=\"padding:14px 10px;border-radius:6px;color:#fff;font:600 22px/1.3 sans-serif;text-align:center\"></div>\n<div id=\"sb-sub\" style=\"margin-top:6px;font:14px/1.4 sans-serif;text-align:center;color:#555\"></div>\n<script>\n(function () {\n  var STALE_MS = 5000; // placeholder until the contract defines the Node timeout\n  function raw(v) { v = String(v); return (v === \"\" || v === \"null\" || v === \"undefined\") ? null : v; }\n\n  var online   = raw(\"${#[\"EV_Gateway\"][\"status\"]}\") === \"1\";\n  var state    = raw(\"${#[\"EV_Gateway\"][\"shadow\"][\"state\"]}\");\n  var cutRaw   = raw(\"${#[\"EV_Gateway\"][\"shadow\"][\"power_cut\"]}\");\n  var powerCut = cutRaw === \"true\";\n  var ageRaw   = raw(\"${#[\"EV_Gateway\"][\"shadow\"][\"node_age_ms\"]}\");\n  var ageMs    = ageRaw === null ? null : Number(ageRaw);\n\n  var STATES = {\n    STARTING:     [\"#1565C0\", \"Starting up\"],\n    NORMAL:       [\"#2E7D32\", \"Normal\"],\n    WARNING:      [\"#F9A825\", \"Warning: check the battery\"],\n    HAZARD:       [\"#C62828\", powerCut ? \"HAZARD: charging power cut\" : \"HAZARD: power cut NOT confirmed\"],\n    SENSOR_ERROR: [\"#6A1B9A\", \"Sensor error\"]\n  };\n  var s = STATES[state] || [\"#616161\", state === null ? \"No data yet\" : \"Unknown state: \" + state];\n  var colour = s[0], text = s[1];\n  if (!online) { colour = \"#616161\"; text = \"OFFLINE: Gateway not connected\" + (state ? \" (last known: \" + state + \")\" : \"\"); }\n\n  var sub = \"Charging power: \" + (cutRaw === null ? \"unknown\" : powerCut ? \"CUT\" : \"supplied\");\n  if (ageMs === null || isNaN(ageMs)) sub += \" · Node data: none\";\n  else if (ageMs > STALE_MS)          sub += \" · Node data STALE (\" + (ageMs / 1000).toFixed(1) + \" s old)\";\n  else                                sub += \" · Node data \" + (ageMs / 1000).toFixed(1) + \" s old\";\n\n  var b = document.getElementById(\"sb-banner\");\n  b.style.background = colour;\n  b.textContent = text;\n  document.getElementById(\"sb-sub\").textContent = sub;\n})();\n</script>\n",
-            "height": 2,
-            "id": "w001"
-          },
-          "id": "w001"
-        },
-        {
-          "type": "indicator",
-          "settings": {
-            "title": "Charging power",
-            "value": "#[\"EV_Gateway\"][\"shadow\"][\"power_cut\"] === true",
-            "oncolor": "#C62828",
-            "offcolor": "#2E7D32",
-            "var_oncolor": "",
-            "var_offcolor": "",
-            "blinking": "false",
-            "blinkfrequency": "2",
-            "on_text": "\"POWER CUT\"",
-            "off_text": "\"CHARGING ALLOWED\"",
-            "id": "w002"
-          },
-          "id": "w002"
-        },
-        {
-          "type": "indicator",
-          "settings": {
-            "title": "Gateway link (NETPIE)",
-            "value": "#[\"EV_Gateway\"][\"status\"] == 1",
-            "oncolor": "#2E7D32",
-            "offcolor": "#616161",
-            "var_oncolor": "",
-            "var_offcolor": "",
-            "blinking": "false",
-            "blinkfrequency": "2",
-            "on_text": "\"Gateway online\"",
-            "off_text": "\"Gateway OFFLINE\"",
-            "id": "w003"
-          },
-          "id": "w003"
-        }
-      ]
+        "4": 1,
+        "5": 1,
+        "6": 1,
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        "10": 1,
+        "11": 1,
+        "12": 1,
+        "13": 1,
+        "14": 1,
+        "15": 1,
+        "16": 1
+      }
     },
     {
       "title": "2. Battery",
       "width": 1,
       "col_width": 2,
-      "row": {
-        "1": 9,
-        "2": 9,
-        "3": 9,
-        "4": 9
-      },
-      "col": {
-        "1": 1,
-        "2": 1,
-        "3": 1,
-        "4": 1
-      },
       "widgets": [
         {
           "type": "text_widget",
@@ -88,9 +66,9 @@
             "sparkline": false,
             "animate": false,
             "units": "°C",
-            "id": "w004"
+            "id": "w002"
           },
-          "id": "w004"
+          "id": "w002"
         },
         {
           "type": "gauge",
@@ -104,9 +82,9 @@
             "human_friendly": false,
             "rangecolor": [],
             "rangeonpercent": false,
-            "id": "w005"
+            "id": "w003"
           },
-          "id": "w005"
+          "id": "w003"
         },
         {
           "type": "text_widget",
@@ -117,9 +95,9 @@
             "sparkline": false,
             "animate": false,
             "units": "°C/s",
-            "id": "w006"
+            "id": "w004"
           },
-          "id": "w006"
+          "id": "w004"
         },
         {
           "type": "Chart",
@@ -138,28 +116,52 @@
             "colors": "",
             "totalyaxis": 2,
             "height_block": 3,
-            "id": "w007"
+            "id": "w005"
           },
-          "id": "w007"
+          "id": "w005"
         }
-      ]
+      ],
+      "row": {
+        "1": 2,
+        "2": 2,
+        "3": 2,
+        "4": 2,
+        "5": 2,
+        "6": 2,
+        "7": 2,
+        "8": 2,
+        "9": 2,
+        "10": 2,
+        "11": 2,
+        "12": 2,
+        "13": 2,
+        "14": 2,
+        "15": 2,
+        "16": 2
+      },
+      "col": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 1,
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        "10": 1,
+        "11": 1,
+        "12": 1,
+        "13": 1,
+        "14": 1,
+        "15": 1,
+        "16": 1
+      }
     },
     {
       "title": "3. Fire / gas",
       "width": 1,
       "col_width": 2,
-      "row": {
-        "1": 9,
-        "2": 9,
-        "3": 9,
-        "4": 9
-      },
-      "col": {
-        "1": 1,
-        "2": 2,
-        "3": 3,
-        "4": 3
-      },
       "widgets": [
         {
           "type": "indicator",
@@ -174,9 +176,9 @@
             "blinkfrequency": "2",
             "on_text": "\"FLAME DETECTED\"",
             "off_text": "\"No flame\"",
-            "id": "w008"
+            "id": "w006"
           },
-          "id": "w008"
+          "id": "w006"
         },
         {
           "type": "text_widget",
@@ -187,9 +189,9 @@
             "sparkline": false,
             "animate": false,
             "units": "raw",
-            "id": "w009"
+            "id": "w007"
           },
-          "id": "w009"
+          "id": "w007"
         },
         {
           "type": "Chart",
@@ -208,28 +210,52 @@
             "colors": "",
             "totalyaxis": 1,
             "height_block": 3,
-            "id": "w010"
+            "id": "w008"
           },
-          "id": "w010"
+          "id": "w008"
         }
-      ]
-    },
-    {
-      "title": "4. Charging",
-      "width": 1,
-      "col_width": 2,
+      ],
       "row": {
-        "1": 31,
-        "2": 31,
-        "3": 31,
-        "4": 31
+        "1": 3,
+        "2": 3,
+        "3": 3,
+        "4": 2,
+        "5": 2,
+        "6": 2,
+        "7": 2,
+        "8": 2,
+        "9": 2,
+        "10": 2,
+        "11": 2,
+        "12": 2,
+        "13": 2,
+        "14": 2,
+        "15": 2,
+        "16": 2
       },
       "col": {
         "1": 1,
         "2": 1,
         "3": 1,
-        "4": 1
-      },
+        "4": 3,
+        "5": 3,
+        "6": 3,
+        "7": 3,
+        "8": 3,
+        "9": 3,
+        "10": 3,
+        "11": 3,
+        "12": 3,
+        "13": 3,
+        "14": 3,
+        "15": 3,
+        "16": 3
+      }
+    },
+    {
+      "title": "4. Charging",
+      "width": 1,
+      "col_width": 2,
       "widgets": [
         {
           "type": "text_widget",
@@ -240,9 +266,9 @@
             "sparkline": false,
             "animate": false,
             "units": "A",
-            "id": "w011"
+            "id": "w009"
           },
-          "id": "w011"
+          "id": "w009"
         },
         {
           "type": "gauge",
@@ -256,9 +282,9 @@
             "human_friendly": false,
             "rangecolor": [],
             "rangeonpercent": false,
-            "id": "w012"
+            "id": "w010"
           },
-          "id": "w012"
+          "id": "w010"
         },
         {
           "type": "Chart",
@@ -277,28 +303,52 @@
             "colors": "",
             "totalyaxis": 1,
             "height_block": 3,
-            "id": "w013"
+            "id": "w011"
           },
-          "id": "w013"
+          "id": "w011"
         }
-      ]
+      ],
+      "row": {
+        "1": 4,
+        "2": 4,
+        "3": 4,
+        "4": 3,
+        "5": 3,
+        "6": 2,
+        "7": 2,
+        "8": 2,
+        "9": 2,
+        "10": 2,
+        "11": 2,
+        "12": 2,
+        "13": 2,
+        "14": 2,
+        "15": 2,
+        "16": 2
+      },
+      "col": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 5,
+        "7": 5,
+        "8": 5,
+        "9": 5,
+        "10": 5,
+        "11": 5,
+        "12": 5,
+        "13": 5,
+        "14": 5,
+        "15": 5,
+        "16": 5
+      }
     },
     {
       "title": "5. Ambient (DHT11)",
       "width": 1,
       "col_width": 2,
-      "row": {
-        "1": 31,
-        "2": 31,
-        "3": 31,
-        "4": 31
-      },
-      "col": {
-        "1": 1,
-        "2": 2,
-        "3": 3,
-        "4": 3
-      },
       "widgets": [
         {
           "type": "text_widget",
@@ -309,9 +359,9 @@
             "sparkline": false,
             "animate": false,
             "units": "°C",
-            "id": "w014"
+            "id": "w012"
           },
-          "id": "w014"
+          "id": "w012"
         },
         {
           "type": "text_widget",
@@ -322,9 +372,9 @@
             "sparkline": false,
             "animate": false,
             "units": "%",
-            "id": "w015"
+            "id": "w013"
           },
-          "id": "w015"
+          "id": "w013"
         },
         {
           "type": "Chart",
@@ -343,37 +393,61 @@
             "colors": "",
             "totalyaxis": 2,
             "height_block": 3,
-            "id": "w016"
+            "id": "w014"
           },
-          "id": "w016"
+          "id": "w014"
         }
-      ]
-    },
-    {
-      "title": "6. Diagnostics",
-      "width": 1,
-      "col_width": 4,
+      ],
       "row": {
-        "1": 51,
-        "2": 51,
-        "3": 51,
-        "4": 51
+        "1": 5,
+        "2": 5,
+        "3": 5,
+        "4": 3,
+        "5": 3,
+        "6": 3,
+        "7": 3,
+        "8": 2,
+        "9": 2,
+        "10": 2,
+        "11": 2,
+        "12": 2,
+        "13": 2,
+        "14": 2,
+        "15": 2,
+        "16": 2
       },
       "col": {
         "1": 1,
         "2": 1,
         "3": 1,
-        "4": 1
-      },
+        "4": 3,
+        "5": 3,
+        "6": 1,
+        "7": 1,
+        "8": 7,
+        "9": 7,
+        "10": 7,
+        "11": 7,
+        "12": 7,
+        "13": 7,
+        "14": 7,
+        "15": 7,
+        "16": 7
+      }
+    },
+    {
+      "title": "6. Diagnostics",
+      "width": 1,
+      "col_width": 16,
       "widgets": [
         {
           "type": "html",
           "settings": {
-            "html": "<!-- NETPIE HTML widget: sensor health / validity table (Diagnostics panel, Height Blocks: 4).\n     The validity object shape is a DRAFT (dashboard/field-mapping.md section 7). -->\n<table id=\"sh-table\" style=\"width:100%;border-collapse:collapse;font:14px/1.4 sans-serif\"></table>\n<script>\n(function () {\n  var STALE_MS = 5000; // keep equal to the banner's value\n  function raw(v) { v = String(v); return (v === \"\" || v === \"null\" || v === \"undefined\") ? null : v; }\n  var nodeAge = raw(\"${#[\"EV_Gateway\"][\"shadow\"][\"node_age_ms\"]}\");\n  var rows = [\n    [\"Node link (ESP-NOW)\", raw(\"${#[\"EV_Gateway\"][\"shadow\"][\"validity\"][\"node_link\"]}\"),\n      nodeAge === null ? \"no data\" : (Number(nodeAge) / 1000).toFixed(1) + \" s old\"],\n    [\"Battery temp (DS18B20)\", raw(\"${#[\"EV_Gateway\"][\"shadow\"][\"validity\"][\"temp_bat\"]}\"), \"\"],\n    [\"Gas (MQ-135, raw)\", raw(\"${#[\"EV_Gateway\"][\"shadow\"][\"validity\"][\"gas\"]}\"), \"\"],\n    [\"Flame (KY-026)\", raw(\"${#[\"EV_Gateway\"][\"shadow\"][\"validity\"][\"flame\"]}\"), \"\"],\n    [\"Ambient (DHT11)\", raw(\"${#[\"EV_Gateway\"][\"shadow\"][\"validity\"][\"ambient\"]}\"), \"\"],\n    [\"Current (ACS712)\", raw(\"${#[\"EV_Gateway\"][\"shadow\"][\"validity\"][\"current\"]}\"), \"\"]\n  ];\n  var html = \"\";\n  for (var i = 0; i < rows.length; i++) {\n    var ok = rows[i][1], label, colour;\n    if (ok === \"true\")       { label = \"OK\";      colour = \"#2E7D32\"; }\n    else if (ok === \"false\") { label = \"FAULT\";   colour = \"#C62828\"; }\n    else                     { label = \"unknown\"; colour = \"#616161\"; }\n    html += \"<tr style='border-bottom:1px solid #ddd'>\" +\n      \"<td style='padding:4px 6px'>\" + rows[i][0] + \"</td>\" +\n      \"<td style='padding:4px 6px;color:\" + colour + \";font-weight:600'>\" + label + \"</td>\" +\n      \"<td style='padding:4px 6px;color:#555'>\" + rows[i][2] + \"</td></tr>\";\n  }\n  document.getElementById(\"sh-table\").innerHTML = html;\n})();\n</script>\n",
+            "html": "<!-- NETPIE HTML widget: sensor health / validity table (Diagnostics panel, Height Blocks: 4).\n     The validity object shape is a DRAFT (dashboard/field-mapping.md section 7). -->\n<!-- Text colour is set explicitly: NETPIE's theme would otherwise draw it white on the white pane. -->\n<table id=\"sh-table\" style=\"width:100%;border-collapse:collapse;font:14px/1.4 Inter,system-ui,sans-serif;color:#1B1F24\"></table>\n<script>\n(function () {\n  var STALE_MS = 5000; // keep equal to the banner's value\n  function raw(v) { v = String(v); return (v === \"\" || v === \"null\" || v === \"undefined\") ? null : v; }\n  var nodeAge = raw(\"${#[\"EV_Gateway\"][\"shadow\"][\"node_age_ms\"]}\");\n  var rows = [\n    [\"Node link (ESP-NOW)\", raw(\"${#[\"EV_Gateway\"][\"shadow\"][\"validity\"][\"node_link\"]}\"),\n      nodeAge === null ? \"no data\" : (Number(nodeAge) / 1000).toFixed(1) + \" s old\"],\n    [\"Battery temp (DS18B20)\", raw(\"${#[\"EV_Gateway\"][\"shadow\"][\"validity\"][\"temp_bat\"]}\"), \"\"],\n    [\"Gas (MQ-135, raw)\", raw(\"${#[\"EV_Gateway\"][\"shadow\"][\"validity\"][\"gas\"]}\"), \"\"],\n    [\"Flame (KY-026)\", raw(\"${#[\"EV_Gateway\"][\"shadow\"][\"validity\"][\"flame\"]}\"), \"\"],\n    [\"Ambient (DHT11)\", raw(\"${#[\"EV_Gateway\"][\"shadow\"][\"validity\"][\"ambient\"]}\"), \"\"],\n    [\"Current (ACS712)\", raw(\"${#[\"EV_Gateway\"][\"shadow\"][\"validity\"][\"current\"]}\"), \"\"]\n  ];\n  var html = \"\";\n  for (var i = 0; i < rows.length; i++) {\n    var ok = rows[i][1], label, colour;\n    if (ok === \"true\")       { label = \"OK\";      colour = \"#2E7D32\"; }\n    else if (ok === \"false\") { label = \"FAULT\";   colour = \"#C62828\"; }\n    else                     { label = \"unknown\"; colour = \"#616161\"; }\n    html += \"<tr style='border-bottom:1px solid #ddd'>\" +\n      \"<td style='padding:4px 6px;color:#1B1F24'>\" + rows[i][0] + \"</td>\" +\n      \"<td style='padding:4px 6px;color:\" + colour + \";font-weight:600'>\" + label + \"</td>\" +\n      \"<td style='padding:4px 6px;color:#555'>\" + rows[i][2] + \"</td></tr>\";\n  }\n  document.getElementById(\"sh-table\").innerHTML = html;\n})();\n</script>\n",
             "height": 4,
-            "id": "w017"
+            "id": "w015"
           },
-          "id": "w017"
+          "id": "w015"
         },
         {
           "type": "text_widget",
@@ -384,9 +458,9 @@
             "sparkline": false,
             "animate": false,
             "units": "s",
-            "id": "w018"
+            "id": "w016"
           },
-          "id": "w018"
+          "id": "w016"
         },
         {
           "type": "text_widget",
@@ -397,9 +471,9 @@
             "sparkline": false,
             "animate": false,
             "units": "",
-            "id": "w019"
+            "id": "w017"
           },
-          "id": "w019"
+          "id": "w017"
         },
         {
           "type": "text_widget",
@@ -410,9 +484,9 @@
             "sparkline": false,
             "animate": false,
             "units": "",
-            "id": "w020"
+            "id": "w018"
           },
-          "id": "w020"
+          "id": "w018"
         },
         {
           "type": "text_widget",
@@ -423,9 +497,9 @@
             "sparkline": false,
             "animate": false,
             "units": "s",
-            "id": "w021"
+            "id": "w019"
           },
-          "id": "w021"
+          "id": "w019"
         },
         {
           "type": "text_widget",
@@ -436,9 +510,9 @@
             "sparkline": false,
             "animate": false,
             "units": "",
-            "id": "w022"
+            "id": "w020"
           },
-          "id": "w022"
+          "id": "w020"
         },
         {
           "type": "Chart",
@@ -457,11 +531,47 @@
             "colors": "",
             "totalyaxis": 1,
             "height_block": 3,
-            "id": "w023"
+            "id": "w021"
           },
-          "id": "w023"
+          "id": "w021"
         }
-      ]
+      ],
+      "row": {
+        "1": 6,
+        "2": 6,
+        "3": 6,
+        "4": 4,
+        "5": 4,
+        "6": 4,
+        "7": 4,
+        "8": 3,
+        "9": 3,
+        "10": 3,
+        "11": 3,
+        "12": 3,
+        "13": 3,
+        "14": 3,
+        "15": 3,
+        "16": 3
+      },
+      "col": {
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 1,
+        "7": 1,
+        "8": 1,
+        "9": 1,
+        "10": 1,
+        "11": 1,
+        "12": 1,
+        "13": 1,
+        "14": 1,
+        "15": 1,
+        "16": 1
+      }
     }
   ]
 }

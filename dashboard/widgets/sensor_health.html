@@ -1,6 +1,7 @@
 <!-- NETPIE HTML widget: sensor health / validity table (Diagnostics panel, Height Blocks: 4).
      The validity object shape is a DRAFT (dashboard/field-mapping.md section 7). -->
-<table id="sh-table" style="width:100%;border-collapse:collapse;font:14px/1.4 sans-serif"></table>
+<!-- Text colour is set explicitly: NETPIE's theme would otherwise draw it white on the white pane. -->
+<table id="sh-table" style="width:100%;border-collapse:collapse;font:14px/1.4 Inter,system-ui,sans-serif;color:#1B1F24"></table>
 <script>
 (function () {
   var STALE_MS = 5000; // keep equal to the banner's value
@@ -22,7 +23,7 @@
     else if (ok === "false") { label = "FAULT";   colour = "#C62828"; }
     else                     { label = "unknown"; colour = "#616161"; }
     html += "<tr style='border-bottom:1px solid #ddd'>" +
-      "<td style='padding:4px 6px'>" + rows[i][0] + "</td>" +
+      "<td style='padding:4px 6px;color:#1B1F24'>" + rows[i][0] + "</td>" +
       "<td style='padding:4px 6px;color:" + colour + ";font-weight:600'>" + label + "</td>" +
       "<td style='padding:4px 6px;color:#555'>" + rows[i][2] + "</td></tr>";
   }
