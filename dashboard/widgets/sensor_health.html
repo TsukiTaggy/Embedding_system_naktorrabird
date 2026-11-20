@@ -1,0 +1,31 @@
+<!-- NETPIE HTML widget: sensor health / validity table (Diagnostics panel, Height Blocks: 4).
+     The validity object shape is a DRAFT (dashboard/field-mapping.md section 7). -->
+<table id="sh-table" style="width:100%;border-collapse:collapse;font:14px/1.4 sans-serif"></table>
+<script>
+(function () {
+  var STALE_MS = 5000; // keep equal to the banner's value
+  function raw(v) { v = String(v); return (v === "" || v === "null" || v === "undefined") ? null : v; }
+  var nodeAge = raw("${#["EV_Gateway"]["shadow"]["node_age_ms"]}");
+  var rows = [
+    ["Node link (ESP-NOW)", raw("${#["EV_Gateway"]["shadow"]["validity"]["node_link"]}"),
+      nodeAge === null ? "no data" : (Number(nodeAge) / 1000).toFixed(1) + " s old"],
+    ["Battery temp (DS18B20)", raw("${#["EV_Gateway"]["shadow"]["validity"]["temp_bat"]}"), ""],
+    ["Gas (MQ-135, raw)", raw("${#["EV_Gateway"]["shadow"]["validity"]["gas"]}"), ""],
+    ["Flame (KY-026)", raw("${#["EV_Gateway"]["shadow"]["validity"]["flame"]}"), ""],
+    ["Ambient (DHT11)", raw("${#["EV_Gateway"]["shadow"]["validity"]["ambient"]}"), ""],
+    ["Current (ACS712)", raw("${#["EV_Gateway"]["shadow"]["validity"]["current"]}"), ""]
+  ];
+  var html = "";
+  for (var i = 0; i < rows.length; i++) {
+    var ok = rows[i][1], label, colour;
+    if (ok === "true")       { label = "OK";      colour = "#2E7D32"; }
+    else if (ok === "false") { label = "FAULT";   colour = "#C62828"; }
+    else                     { label = "unknown"; colour = "#616161"; }
+    html += "<tr style='border-bottom:1px solid #ddd'>" +
+      "<td style='padding:4px 6px'>" + rows[i][0] + "</td>" +
+      "<td style='padding:4px 6px;color:" + colour + ";font-weight:600'>" + label + "</td>" +
+      "<td style='padding:4px 6px;color:#555'>" + rows[i][2] + "</td></tr>";
+  }
+  document.getElementById("sh-table").innerHTML = html;
+})();
+</script>

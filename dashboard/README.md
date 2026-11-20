@@ -13,6 +13,6 @@ This folder contains dashboard planning and safe-to-commit setup/export artifact
 - Gateway cut-off state (`power_cut`).
 - Optional temperature trend (`temp_rate_c_per_s`) if implemented.
 
-Use `../docs/data-contract.md` as the source of field definitions. Show invalid or stale readings distinctly from zero. Remote stop/reset controls are not planned until a safe command path and reset behavior are defined and tested.
+Use `../docs/data-contract.md` as the source of field definitions. The widget-by-widget plan, NETPIE setup, display rules, and test steps are in [`field-mapping.md`](field-mapping.md); sample messages are in `../docs/samples/`. Show invalid or stale readings distinctly from zero. Remote stop/reset controls are not planned until a safe command path and reset behavior are defined and tested.
 
 Never commit access tokens, credentials, or webhook URLs.
