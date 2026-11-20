@@ -4,6 +4,8 @@
 
 Build the software for an embedded charging safety monitor. The system should monitor battery temperature and other available sensor signals, identify unsafe conditions, alert the user, and support a controlled power cut. The first development target is a computer simulator and dashboard; the firmware will run on ESP32 hardware later.
 
+> Progress update 2026-11-20: simulator, safety-logic prototype, sample messages, and the NETPIE dashboard are built and tested. See `simulator/README.md` and `dashboard/field-mapping.md`.
+
 > Confirmed hardware plan: two ESP32 DevKit V1 30-pin boards. The Sensor Node uses DS18B20/KY-001, MQ-135, and interrupt-driven KY-026; the Gateway uses ACS712 5 A, DHT11, MG90S servo, and KY-004. ESP-NOW and NETPIE are planned. Pin mappings, thresholds, calibration, protocol details, and button stop/reset behavior still need agreement.
 
 ## 1. Define the software requirements
@@ -28,74 +30,74 @@ Build the software for an embedded charging safety monitor. The system should mo
   - [x] `docs/` — architecture, data contract, wiring references, setup, and test notes
 - [x] Add root and component README files with project purpose, responsibilities, and current decisions.
 - [x] Add `.gitignore` entries for local secrets and common generated/build files.
-- [ ] Add a tracked `config.example.h` or equivalent template with placeholder values only.
-- [ ] Keep real cloud credentials and webhook URLs out of source control; use local config or environment variables.
-- [ ] Choose and record the firmware toolchain (Arduino IDE or PlatformIO) and the simulator Python version.
+- [ ] Add a tracked `config.example.h` or equivalent template with placeholder values only. _(simulator done: `simulator/.env.example`; firmware `config.example.h` still needed)_
+- [x] Keep real cloud credentials and webhook URLs out of source control; use local config or environment variables. _(NETPIE keys live in ignored `simulator/.env`)_
+- [ ] Choose and record the firmware toolchain (Arduino IDE or PlatformIO) and the simulator Python version. _(simulator: Python 3.9+ recorded in `simulator/README.md`; firmware toolchain not chosen)_
 
 ## 3. Agree on the data contract
 
-- [ ] Define one versioned message format shared by the simulator, firmware, dashboard, and alert code.
-- [ ] Include fields only when they have a clear source and unit. Suggested starting fields:
-  - [ ] `timestamp` or sequence number
-  - [ ] `temp_bat_c`
-  - [ ] `temp_ambient_c`
-  - [ ] `humidity_pct`
-  - [ ] `current_a`
-  - [ ] `gas_raw` (or a calibrated unit if calibration is available)
-  - [ ] `flame_detected`
-  - [ ] `temp_rate_c_per_s`
-  - [ ] `state`
-  - [ ] `power_cut`
-  - [ ] sensor validity / error flags
-- [ ] Specify types, units, valid ranges, missing-value behavior, and message frequency.
+- [x] Define one versioned message format shared by the simulator, firmware, dashboard, and alert code. _(`docs/data-contract.md`, `schema_version` 1; used by simulator and dashboard)_
+- [x] Include fields only when they have a clear source and unit. Suggested starting fields:
+  - [x] `timestamp` or sequence number
+  - [x] `temp_bat_c`
+  - [x] `temp_ambient_c`
+  - [x] `humidity_pct`
+  - [x] `current_a`
+  - [x] `gas_raw` (or a calibrated unit if calibration is available)
+  - [x] `flame_detected`
+  - [x] `temp_rate_c_per_s`
+  - [x] `state`
+  - [x] `power_cut`
+  - [x] sensor validity / error flags _(`validity` object; shape is still a draft)_
+- [ ] Specify types, units, valid ranges, missing-value behavior, and message frequency. _(types/units done; tested that NETPIE deletes `null` fields; ranges and publish rate still open, free quota limits ~1 msg/6 s continuous)_
 - [ ] Define how Node-to-Gateway messages are identified and how stale or duplicate readings are handled.
-- [ ] Save sample normal, warning, hazard, and sensor-error messages in `docs/`.
-- [ ] Keep the contract transport-neutral so cloud/ESP-NOW details can change without changing field meanings.
+- [x] Save sample normal, warning, hazard, and sensor-error messages in `docs/`. _(`docs/samples/`, plus a stale-Node sample)_
+- [x] Keep the contract transport-neutral so cloud/ESP-NOW details can change without changing field meanings. _(NETPIE `{"data": ...}` wrapper is added only by the publisher)_
 
 ## 4. Build the computer simulator first
 
-- [ ] Create `simulator/virtual_gateway.py` to generate readings using the agreed data contract.
-- [ ] Add repeatable scenarios for:
-  - [ ] Normal, stable charging
-  - [ ] Gradual temperature increase
-  - [ ] Rapid temperature rise
-  - [ ] Over-temperature condition
-  - [ ] Flame or gas warning (if those sensors are in project scope)
-  - [ ] Disconnected or invalid sensor
-  - [ ] Lost network connection and reconnection
-- [ ] Make scenario rate and values configurable from command-line options or a local config file.
-- [ ] Print readable logs showing readings, state changes, and alert decisions.
-- [ ] First validate simulator behavior locally without cloud credentials.
-- [ ] Add a dry-run mode that never sends external alerts or commands.
+- [x] Create `simulator/virtual_gateway.py` to generate readings using the agreed data contract.
+- [x] Add repeatable scenarios for: _(9 scenarios incl. node_stale and button_reset; fixed seed)_
+  - [x] Normal, stable charging
+  - [x] Gradual temperature increase
+  - [x] Rapid temperature rise
+  - [x] Over-temperature condition
+  - [x] Flame or gas warning (if those sensors are in project scope)
+  - [x] Disconnected or invalid sensor
+  - [x] Lost network connection and reconnection
+- [x] Make scenario rate and values configurable from command-line options or a local config file. _(`--interval`, `--speed`, `--duration`, `--seed`, `--thresholds`)_
+- [x] Print readable logs showing readings, state changes, and alert decisions.
+- [x] First validate simulator behavior locally without cloud credentials. _(21 unit tests)_
+- [x] Add a dry-run mode that never sends external alerts or commands. _(default mode; `--publish` is opt-in)_
 
 ## 5. Implement and review the safety decision logic
 
-- [ ] Separate sensor acquisition, filtering, trend calculation, state decision, and output actions into distinct modules/functions.
-- [ ] Decide how to filter noisy readings and reject impossible values.
-- [ ] Define behavior when readings are missing, stale, or inconsistent; fail to a clearly visible safe state.
-- [ ] If using a temperature trend (`dT/dt`), define its sample window, units, minimum data needed, and handling of noisy or missing samples.
-- [ ] If using a decision tree or other classifier, write down its rules in plain language and make them inspectable.
-- [ ] Add hysteresis or a deliberate recovery rule to avoid rapidly switching between `NORMAL` and `WARNING` near a threshold.
-- [ ] Ensure alert and power-cut actions are triggered once per event or are rate-limited, rather than repeating on every sample.
-- [ ] Log why each state transition happened (for example, threshold crossed, sensor fault, or manual cut command).
-- [ ] Review all thresholds and actions with the class team before hardware operation.
+- [x] Separate sensor acquisition, filtering, trend calculation, state decision, and output actions into distinct modules/functions. _(simulator prototype; firmware port pending)_
+- [ ] Decide how to filter noisy readings and reject impossible values. _(not done yet)_
+- [x] Define behavior when readings are missing, stale, or inconsistent; fail to a clearly visible safe state. _(prototype: `SENSOR_ERROR`, power not cut automatically; team decision pending)_
+- [x] If using a temperature trend (`dT/dt`), define its sample window, units, minimum data needed, and handling of noisy or missing samples. _(least-squares over 10 s, min 5 samples, °C/s)_
+- [x] If using a decision tree or other classifier, write down its rules in plain language and make them inspectable. _(`simulator/README.md` decision rules)_
+- [x] Add hysteresis or a deliberate recovery rule to avoid rapidly switching between `NORMAL` and `WARNING` near a threshold. _(5 clear samples)_
+- [ ] Ensure alert and power-cut actions are triggered once per event or are rate-limited, rather than repeating on every sample. _(power cut latched until local RESET; alerts not implemented yet)_
+- [x] Log why each state transition happened (for example, threshold crossed, sensor fault, or manual cut command).
+- [ ] Review all thresholds and actions with the class team before hardware operation. _(current thresholds are placeholders)_
 
 ## 6. Create the dashboard
 
-- [ ] Confirm which cloud/dashboard service the team will use and verify that it currently supports the needed device, data, and dashboard features.
-- [ ] Create the project/device and store its credentials locally, not in Git.
-- [ ] Connect the simulator to the service only after the data contract works locally.
-- [ ] Build a dashboard that clearly shows:
-  - [ ] Current system state (`NORMAL`, `WARNING`, `HAZARD`, etc.)
-  - [ ] Battery temperature and its history
-  - [ ] Temperature rise rate, if implemented
-  - [ ] Ambient temperature and humidity
-  - [ ] Current, gas, or flame values when those inputs are implemented
-  - [ ] Last update time and connectivity status
-  - [ ] Power-cut state
-- [ ] Use labels with units and sensible chart ranges; distinguish unavailable readings from zero.
-- [ ] Test the dashboard with each simulator scenario and confirm displayed states match simulator logs.
-- [ ] Add dashboard controls only if the cloud service and firmware support a safe command path.
+- [x] Confirm which cloud/dashboard service the team will use and verify that it currently supports the needed device, data, and dashboard features. _(NETPIE 2020, tested)_
+- [x] Create the project/device and store its credentials locally, not in Git. _(project `Smart-EV-Battery-Guard`, device `EV_Gateway`)_
+- [x] Connect the simulator to the service only after the data contract works locally. _(REST transport; MQTT TLS blocked by NEXPIE private CA)_
+- [x] Build a dashboard that clearly shows: _(`Charging Safety Monitor`, 6 panels / 23 widgets)_
+  - [x] Current system state (`NORMAL`, `WARNING`, `HAZARD`, etc.)
+  - [x] Battery temperature and its history
+  - [x] Temperature rise rate, if implemented
+  - [x] Ambient temperature and humidity
+  - [x] Current, gas, or flame values when those inputs are implemented
+  - [ ] Last update time and connectivity status _(Node data age shown; online indicator follows MQTT only, so it stays offline during REST tests; no wall-clock last-update time yet)_
+  - [x] Power-cut state
+- [x] Use labels with units and sensible chart ranges; distinguish unavailable readings from zero.
+- [ ] Test the dashboard with each simulator scenario and confirm displayed states match simulator logs. _(all samples and live `button_reset` passed; other scenarios not yet run live)_
+- [ ] Add dashboard controls only if the cloud service and firmware support a safe command path. _(none added; dashboard has read-only privileges)_
 - [ ] For any remote cut/reset control, require a deliberate action, show command status, and prevent a cloud command from silently re-enabling charging.
 
 ## 7. Implement notifications
